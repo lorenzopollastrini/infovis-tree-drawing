@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Incremental force-directed tree drawing</title>
+    <link href="style.css" rel="stylesheet" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body id="body">
+<h1>Incremental force-directed tree drawing</h1>
+
+<p id="tree-description">
+    A random tree with <span id="node-count"></span> nodes has been generated and is ready to be drawn.
+</p>
+
+<form id="tree-form" class="params-form centered-block">
+    <div class="form-row">
+        <label for="max-children-count">Maximum children per node:</label>
+        <input type="number" name="maxChildrenCount" id="max-children-count" />
+        <label for="tree-height">Tree height:</label>
+        <input type="number" name="treeHeight" id="tree-height" />
+        <button type="submit">Regenerate</button>
+    </div>
+</form>
+
+<div class="button-group centered-block">
+    <div class="button-group-row">
+        <button type="button" onclick="startClassicalAlgorithm()">Start classical drawing algorithm</button>
+    </div>
+    <div class="button-group-row">
+        <button type="button" onclick="startIncrementalAlgorithm()">Start incremental drawing algorithm</button>
+    </div>
+</div>
+
+
+<div id="svg-container" class="centered-block">
+    <svg></svg>
+</div>
+
+<p>Iterations: <strong><span id="iteration-counter">0</span></strong></p>
+<p>Time: <strong><span id="stopwatch">0.000</span> s</strong></p>
+
+<form id="simulation-form" class="params-form centered-block">
+    <div class="form-row">
+        <label for="many-body-strength">Charge:</label>
+        <input type="number" name="manyBodyStrength" id="many-body-strength" />
+        <label for="link-distance">Spring length:</label>
+        <input type="number" name="linkDistance" id="link-distance" />
+    </div>
+    <div class="form-row">
+        <label for="classical-convergence-threshold">Classical convergence:</label>
+        <input type="number" step="0.1" name="classicalConvergenceThreshold" id="classical-convergence-threshold" />
+        <label for="incremental-convergence-threshold">Incremental convergence:</label>
+        <input type="number" step="0.1" name="incrementalConvergenceThreshold" id="incremental-convergence-threshold" />
+        <button type="submit">Submit</button>
+    </div>
+</form>
+<p></p>
+<script src="script.js"></script>
+</body>
+</html>

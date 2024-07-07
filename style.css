@@ -1,0 +1,43 @@
+h1, p {
+    text-align: center;
+}
+
+.centered-block {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+#svg-container {
+    border-style: solid;
+}
+
+svg {
+    display: block;
+}
+
+.params-form {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 0 5px;
+}
+
+.form-row {
+    display: table-row;
+}
+
+label, input, form button {
+    display: table-cell;
+}
+
+input {
+    margin: 0 1em;
+}
