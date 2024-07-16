@@ -215,8 +215,13 @@ function ticked() {
         simulation.stop();
         if (incremental) {
             if (lastAddedLayer < treeParams.treeHeight) {
+                if (lastAddedLayer === treeParams.treeHeight - 1) {
+                    // For the last layer, use the classical convergence threshold for comparison fairness
+                    currentConvergenceThreshold = simulationParams.classicalConvergenceThreshold;
+                }
                 stopStopwatch();
-                incrementalStep(lastAddedLayer + 1);
+                let nextStep = lastAddedLayer + 1;
+                incrementalStep(nextStep);
             } else {
                 stopStopwatch();
             }

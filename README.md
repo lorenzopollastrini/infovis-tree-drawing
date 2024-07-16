@@ -15,4 +15,6 @@ The root node of the tree is highlighted in red.
 causes nodes to repel each other);
 * Spring length: the length at rest of the springs associated to every edge;
 * Classical convergence: the velocity every node has to reach for convergence in the classical algorithm;
-* Incremental convergence: the velocity every node has to reach for convergence in the incremental algorithm.
+* Incremental convergence: the velocity every node has to reach for convergence after adding a layer that is not the
+last one in the incremental algorithm. For the last layer, the classical convergence threshold is used instead, for
+comparison fairness.
