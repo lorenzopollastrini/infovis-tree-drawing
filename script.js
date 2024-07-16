@@ -305,8 +305,8 @@ let nodes = []; // D3.js nodes
 let links = []; // D3.js links (assuming source is target's parent)
 
 let simulationParams = {
-    manyBodyStrength: -100,
-    linkDistance: 30,
+    manyBodyStrength: -50,
+    linkDistance: 50,
     spawnOffsetMultiplier: 1,
     classicalConvergenceThreshold: 0.5,
     incrementalConvergenceThreshold: 0.7
@@ -316,7 +316,7 @@ let incremental; // Boolean that indicates whether to use the incremental approa
 
 const simulation = d3.forceSimulation(nodes)
     .force("manyBody", d3.forceManyBody().strength(simulationParams.manyBodyStrength))
-    .force("link", d3.forceLink(links).distance(simulationParams.linkDistance))
+    .force("link", d3.forceLink(links).distance(simulationParams.linkDistance).strength(1))
     .force("center", d3.forceCenter(frameWidth / 2, frameHeight / 2))
     .alphaDecay(0)
     .velocityDecay(0.75)
