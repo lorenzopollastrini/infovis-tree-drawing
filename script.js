@@ -178,7 +178,7 @@ function ticked() {
         }
     }
 
-    svg.selectAll("line")
+    svgGroup.selectAll("line")
         .data(links)
         .join(
             enter => enter.insert("line", ":first-child"),
@@ -197,7 +197,7 @@ function ticked() {
         })
         .attr("stroke", "black");
 
-    svg.selectAll("circle")
+    svgGroup.selectAll("circle")
         .data(nodes)
         .join("circle")
         .attr("r", 5)
@@ -224,6 +224,10 @@ function ticked() {
             stopStopwatch();
         }
     }
+}
+
+function handleZoom(event) {
+    svgGroup.attr("transform", event.transform);
 }
 
 function resetSimulation() {
@@ -290,6 +294,8 @@ const frameHeight = 600;
 const svg = d3.select("svg")
     .attr("width", frameWidth)
     .attr("height", frameHeight);
+svg.call(d3.zoom().on("zoom", handleZoom));
+const svgGroup = svg.append("g"); // Group to allow zooming and panning
 
 let treeParams = {
     maxChildrenCount: 2,
