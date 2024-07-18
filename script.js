@@ -96,23 +96,88 @@ function computeLayers(tree) {
 }
 
 /**
- * Adds the next layer of nodes to the drawing. Node labels are mapped to new index values required by D3.js.
+ * Adds the next layer of nodes to the drawing and restarts the simulation.
  */
 function incrementalStep(step) {
     if (step === 0) {
+        // Place the root at the center of the frame
         nodes.push({index: 0, parent: null, x: frameWidth / 2, y: frameHeight / 2});
-    } else {
-        layers[step].forEach(function (node) {
+    } else if (step === 1) {
+        // Evenly distribute nodes around the root
+        let numNodes = layers[1].length
+        layers[1].forEach(function(node, i) {
+            let nodeAngle = i / numNodes * 2 * Math.PI;
+
             // Update D3.js nodes
-            let parent = tree[node].parent;
-            let nodeSpawn = incrementalNodeSpawn(node);
-            nodes.push({index: node, parent: parent, x: nodeSpawn.x, y: nodeSpawn.y});
+            nodes.push({
+                index: node,
+                parent: 0,
+                x: nodes[0].x + simulationParams.linkDistance * Math.cos(nodeAngle),
+                y: nodes[0].y + simulationParams.linkDistance * Math.sin(nodeAngle)
+            });
 
             // Update D3.js links
-            links.push({source: parent, target: node});
+            links.push({source: 0, target: node});
+        });
+    } else {
+        // Evenly distribute nodes on semicircles directed away from their parents and grandparents
+        let leaves = layers[step - 1];
+        leaves.forEach(function(leaf) {
+            let children = tree[leaf].children;
+            children.forEach(function(child, i) {
+                let parent = tree[child].parent;
+                let parentX = nodes[parent].x;
+                let parentY = nodes[parent].y;
+
+                let grandparent = tree[parent].parent;
+                let grandparentX = nodes[grandparent].x;
+                let grandparentY = nodes[grandparent].y;
+
+                let parentGrandparentAngle =
+                    Math.abs(Math.atan((parentY - grandparentY) / (parentX - grandparentX)));
+
+                let childAngle = 3 / 2 * Math.PI; // Initially rotate the semicircle to make it face right
+
+                // Direct the semicircle away from the parent and grandparent
+                if (parentX > grandparentX) { // The parent is to the right of the grandparent
+                    if (parentY >= grandparentY) { // The parent is exactly to the right or at the bottom right
+                        childAngle += parentGrandparentAngle;
+                    } else { // The parent is at the top right
+                        childAngle += -parentGrandparentAngle;
+                    }
+                } else { // The parent is to the left of the grandparent
+                    if (parentY <= grandparentY) { // The parent is exactly to the left or at the top left
+                        childAngle += parentGrandparentAngle - Math.PI;
+                    } else { // The parent is at the bottom left
+                        childAngle += - parentGrandparentAngle + Math.PI;
+                    }
+                }
+
+                // Determine the child position on the semicircle based on the number of children of its parent
+                if (children.length === 1) {
+                    // Place the child at the halfway point of the semicircle
+                    childAngle += Math.PI / 2;
+                } else if (children.length === 2) {
+                    // Place the child either at one fourth or three fourths of the semicircle
+                    childAngle += (1/4 + 1/2 * i) * Math.PI;
+                } else {
+                    // Place the child using all the available length of the semicircle
+                    childAngle += i / (children.length - 1) * Math.PI;
+                }
+
+                // Update D3.js nodes
+                nodes.push({
+                    index: child,
+                    parent: parent,
+                    x: parentX + simulationParams.linkDistance * Math.cos(childAngle),
+                    y: parentY + simulationParams.linkDistance * Math.sin(childAngle)
+                });
+
+                // Update D3.js links
+                links.push({source: parent, target: child});
+            });
         });
     }
-
     simulation.nodes(nodes);
     simulation.force("link").links(links);
 
@@ -120,49 +185,6 @@ function incrementalStep(step) {
 
     simulation.restart();
     startStopwatch();
-}
-
-/**
- * Computes the spawn position of a given node according to the incremental algorithm. The node is spawned in a random
- * position inside a circle directed away from its parent and grandparent.
- * @param node the node to compute the spawn position for.
- * @returns the spawn coordinates as an object with properties x and y.
- */
-function incrementalNodeSpawn(node) {
-    let parent = tree[node].parent;
-    let parent_x = nodes[parent].x;
-    let parent_y = nodes[parent].y;
-
-    let max_epsilon = 1;
-    let min_epsilon = -1;
-    let epsilon_x = Math.random() * (max_epsilon - min_epsilon) + min_epsilon;
-    let epsilon_y = Math.random() * (max_epsilon - min_epsilon) + min_epsilon;
-
-    // If the parent is the root, spawn the node in a random position inside a circle around the root
-    if (parent === 0) {
-        return {
-            x: parent_x + epsilon_x,
-            y: parent_y + epsilon_y
-        };
-    }
-
-    // If the parent is not the root, spawn the node in a random point of a circle directed away from the parent
-    let grandparent = tree[parent].parent;
-    let grandparent_x = nodes[grandparent].x;
-    let grandparent_y = nodes[grandparent].y;
-
-    // (offset_x, P_y) are the components of the vector that goes from the grandparent to the parent of the node
-    let offset_x = parent_x - grandparent_x;
-    let offset_y = parent_y - grandparent_y;
-
-    // The circle is centered in (C_x, C_y)
-    let C_x = parent_x + simulationParams.spawnOffsetMultiplier * offset_x;
-    let C_y = parent_y + simulationParams.spawnOffsetMultiplier * offset_y;
-
-    return {
-        x: C_x + epsilon_x,
-        y: C_y + epsilon_y
-    };
 }
 
 function ticked() {
@@ -318,7 +340,6 @@ let links = []; // D3.js links (assuming source is target's parent)
 let simulationParams = {
     manyBodyStrength: -50,
     linkDistance: 50,
-    spawnOffsetMultiplier: 1,
     classicalConvergenceThreshold: 0.5,
     incrementalConvergenceThreshold: 0.7
 };

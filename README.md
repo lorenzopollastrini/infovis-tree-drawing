@@ -5,7 +5,8 @@ This tool allows to compare the performances of the following two algorithms for
 * Peter Eades' Spring Embedder (denoted as _classical algorithm_);
 * Spring Embedder variant (denoted as _incremental algorithm_), where the layers of the tree are introduced
 incrementally (starting from the root), i.e., each layer of the tree is introduced in the drawing only after the drawing
-of the previous layer has reached equilibrium.
+of the previous layer has reached equilibrium. The initial positions of the nodes of a layer are determined in a way
+that facilitates convergence.
 
 The root node of the tree is highlighted in red.
 
