@@ -340,7 +340,7 @@ let links = []; // D3.js links (assuming source is target's parent)
 let simulationParams = {
     manyBodyStrength: -50,
     linkDistance: 50,
-    classicalConvergenceThreshold: 0.5,
+    classicalConvergenceThreshold: 0.2,
     incrementalConvergenceThreshold: 0.7
 };
 
